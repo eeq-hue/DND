@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notice Board</title>
+  <style>
+    @font-face { font-family: 'Beth Ellen'; src: url('../Font/BethEllen-Regular.ttf') format('truetype'); }
+    @font-face { font-family: 'Bestie Seventy'; src: url('../Font/notice%20board/Bestie%20Seventy.ttf') format('truetype'); }
+    @font-face { font-family: 'Beverly Sage'; src: url('../Font/notice%20board/Beverly%20Sage.otf') format('opentype'); }
+    @font-face { font-family: 'Crustaceans Signature'; src: url('../Font/notice%20board/Crustaceans-SignatureDEMO-Regular.otf') format('opentype'); }
+    @font-face { font-family: 'Fighter Attack'; src: url('../Font/notice%20board/Fighter%20Attack.ttf') format('truetype'); }
+    @font-face { font-family: 'Gathenia'; src: url('../Font/notice%20board/Gathenia.otf') format('opentype'); }
+    @font-face { font-family: 'Humble Signation'; src: url('../Font/notice%20board/Humble%20Signation.ttf') format('truetype'); }
+    @font-face { font-family: 'Jalliya'; src: url('../Font/notice%20board/Jalliya.ttf') format('truetype'); }
+    @font-face { font-family: 'Rawrote Demo'; src: url('../Font/notice%20board/Rawrote%20Demo.ttf') format('truetype'); }
+    @font-face { font-family: 'Rockybilly'; src: url('../Font/notice%20board/Rockybilly.ttf') format('truetype'); }
+    @font-face { font-family: 'Samarata'; src: url('../Font/notice%20board/Samarata.ttf') format('truetype'); }
+    @font-face { font-family: 'Scribble Markers'; src: url('../Font/notice%20board/Scribble%20Markers.otf') format('opentype'); }
+    @font-face { font-family: 'Signatie'; src: url('../Font/notice%20board/Signatie.otf') format('opentype'); }
+    @font-face { font-family: 'Vanilla Cream'; src: url('../Font/notice%20board/VanillaCreamOx-Regular.otf') format('opentype'); }
+    @font-face { font-family: 'Wild Favour'; src: url('../Font/notice%20board/WildFavour-Regular-SVG-SVG.otf') format('opentype'); }
+
+    :root {
+      --da-brown:   #3B2F2F;
+      --da-oxblood: #4A0E18;
+      --da-gold:    #B08D57;
+      --da-green:   #2C3B2D;
+      --da-cream:   #E8E0CF;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: transparent;
+      font-family: 'Palatino Linotype', Palatino, serif;
+      cursor: default;
+    }
+
+    .notice-panel { position: relative; width: 100%; height: 100%; overflow: visible; }
+
+
+.post-note-btn,
+.post-note-btn * {
+  cursor: url('../Images/cursor_mag_hover_72.png') 18 18, pointer !important;
+}
+
+.mag-photo,
+.mag-photo * {
+  cursor: url('../Images/cursor_mag_hover_72.png') 18 18, pointer !important;
+}
+
+.get_well_soon,
+.get_well_soon * {
+  cursor: url('../Images/cursor_mag_hover_72.png') 18 18, pointer !important;
+}
+
+.sign-card-btn,
+.sign-card-btn *,
+.card-popup-close,
+.card-popup-close *,
+.card-sig-delete,
+.card-sig-delete * {
+  cursor: pointer !important;
+}
+
+/* Notes: regular notes show hand, owned notes show grab, active drag shows grabbing */
+.pinned-note,
+.pinned-note * {
+  cursor: pointer;
+}
+
+.pinned-note.mine,
+.pinned-note.mine * {
+  cursor: grab;
+}
+
+body.is-dragging-note,
+body.is-dragging-note *,
+.pinned-note.mine.dragging,
+.pinned-note.mine.dragging * {
+  cursor: grabbing !important;
+}
+
+.note-delete,
+.note-delete * {
+  cursor: pointer !important;
+}
+
+/* Interactive controls inside note/event popups */
+.modal-btn,
+.modal-btn *,
+.style-btn,
+.style-btn *,
+.font-picker-trigger,
+.font-picker-trigger *,
+.font-picker-option,
+.font-picker-option *,
+.color-swatch,
+.color-swatch *,
+.add-event-btn,
+.add-event-btn *,
+.event-box-close,
+.event-box-close * {
+  cursor: pointer !important;
+}
+
+/* Text fields should still show the text cursor */
+.modal-input,
+.modal-textarea,
+.add-event-input,
+.add-event-textarea {
+  cursor: text !important;
+}
+
+
+    .notice-board-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+    .loading-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #f5edda; font-size: 13px; letter-spacing: 2px; z-index: 2; }
+
+    .mag-pin {
+  position: absolute;
+
+  top: -6px;
+  left: 59%;
+
+  transform: translateX(-50%);
+
+  width: 12px;
+  height: 12px;
+
+  border-radius: 50%;
+
+  background: var(--da-gold);
+
+  z-index: 100;
+}
+
+    .mag-outer {
+      position: absolute;
+      left: 89.5%; top: 41%;
+      width: 354px;
+      z-index: 5;
+      transform: translate(-50%, -50%) rotate(1deg);
+      transform-origin: center center;
+      filter: drop-shadow(3px 6px 14px rgba(0,0,0,0.55));
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), width 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .mag-wrap { background: #f0ece0; border: 3px solid #131313; border-radius: 2px; overflow: visible; position: relative; }
+    .mag-header { background: var(--da-brown); color: var(--da-gold); padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; }
+    .mag-header-title { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
+    .mag-header-issue { font-size: 10px; color: #888; letter-spacing: 1px; }
+    .mag-photo-wrap { position: relative; }
+    .photo-enlarged-overlay {
+      display: none; position: absolute; inset: 0;
+      background: rgba(20,10,0,0.78);
+      z-index: 996; align-items: center; justify-content: center;
+    }
+    .photo-enlarged-overlay.open { display: flex; }
+    .photo-enlarged-img {
+      max-width: 70%; max-height: 80%;
+      object-fit: contain;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+      border: 4px solid var(--da-cream);
+    }
+    .mag-photo {
+      width: 94%; aspect-ratio: 4 / 4; overflow: hidden; position: relative;
+      border-bottom: 2px solid var(--da-gold);
+      background: var(--da-cream);
+      display: flex; align-items: center; justify-content: center;
+      padding: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transform-origin: center center;
+    }
+    .mag-photo img { width: 88%; height: 88%; object-fit: contain; display: block; margin: auto; }
+    .mag-crease-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.25)); pointer-events: none; z-index: 4; }
+    .mag-close-hint { display: none; position: absolute; top: -20px; right: 0; font-size: 9px; letter-spacing: 1px; color: #f0ece0; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 2px; white-space: nowrap; pointer-events: none; }
+    .mag-outer.expanded .mag-close-hint { display: block; }
+
+
+    .cal-section { background: var(--da-cream); position: relative; overflow: visible; }
+    .cal-crease-top { position: absolute; top: 0; left: 0; right: 0; height: 22px; background: linear-gradient(to top, rgba(0,0,0,0), rgba(59,47,47,0.22)); pointer-events: none; z-index: 4; }
+    .cal-section-header { background: var(--da-brown); color: var(--da-gold); text-align: center; padding: 10px 12px 8px; }
+    .cal-month { font-size: 20px; letter-spacing: 3px; text-transform: uppercase; margin: 0 0 3px; }
+    .cal-year  { font-size: 13px; letter-spacing: 1.6px; color: var(--da-gold); margin: 0; }
+    .cal-grid  { padding: 20px; }
+    .cal-days-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 5px; }
+    .cal-day-name { text-align: center; font-size: 11px; letter-spacing: 0.7px; color: var(--da-brown); text-transform: uppercase; padding: 5px 0; border-bottom: 1px solid var(--da-gold); }
+    .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-day {
+      text-align: center; padding: 6px 2px; font-size: 13px; color: var(--da-brown);
+      min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      gap: 2px; border-radius: 2px; position: relative;
+      transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+    }
+    .cal-day.today { background: var(--da-oxblood); color: var(--da-cream); }
+    .cal-day.today .weather-icon { color: var(--da-gold); }
+    .cal-day.this-week:not(.today) { background: rgba(176,141,87,0.14); }
+    .cal-day:hover { background: rgba(176,141,87,0.24); transform: translateY(-1px); box-shadow: inset 0 0 0 1px rgba(59,47,47,0.18); }
+    .cal-day.today:hover { background: #3B2F2F; box-shadow: inset 0 0 0 1px rgba(176,141,87,0.45); }
+    .cal-day.has-event:hover:not(.today),
+    .cal-day.custom-event:hover:not(.today) { background: rgba(74,14,24,0.16); }
+    .cal-day.custom-event:hover { border-color: var(--da-oxblood); }
+    .cal-day.custom-event { border: 2px solid #cc2222; border-radius: 4px; }
+    .cal-day.custom-event.today { border-color: #ff6666; }
+
+    .event-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .weather-icon { font-size: 15px; line-height: 1; position: static; }
+    .weather-tooltip {
+      display: none; position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+      width: max-content; max-width: 220px;
+      background: var(--da-brown); color: var(--da-cream); border: 1px solid var(--da-gold);
+      font-size: 14px; line-height: 1.35; white-space: normal; overflow-wrap: break-word;
+      padding: 8px 12px; border-radius: 2px; z-index: 9999; pointer-events: none;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+    }
+    .weather-icon:hover .weather-tooltip { display: block; }
+    .weather-tooltip.left-edge  { left: 0; transform: none; }
+    .weather-tooltip.right-edge { left: auto; right: 0; transform: none; }
+
+    .cal-day, .cal-grid, .cal-days, .cal-section, .mag-wrap { overflow: visible; }
+
+    .cal-footer { text-align: center; font-size: 9px; color: var(--da-brown); letter-spacing: 1.2px; padding: 5px 8px 7px; text-transform: uppercase; border-top: 1px solid rgba(176,141,87,0.42); }
+
+    .pinned-note { position: absolute; z-index: 6; filter: drop-shadow(2px 3px 6px rgba(0,0,0,0.4)); max-width: 220px; min-width: 160px; }
+    .pinned-note:hover { z-index: 7; }
+
+    .note-index { background: #f8f5ee; border: 1px solid #ccc; border-top: 4px solid #8a6a2a; padding: 10px 10px 8px; font-size: 17px; line-height: 1.5; color: #1a1a1a; }
+    .note-index .note-lines { border-bottom: 1px solid #d0c8b0; padding-bottom: 2px; margin-bottom: 4px; }
+    .note-sticky { padding: 10px; font-size: 17px; line-height: 1.5; color: #1a1a1a; }
+    .note-torn {
+      background: #fff;
+      background-image: url('https://images.unsplash.com/photo-1524312966005-030e396636fd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjF8fG9sZCUyMHBhcGVyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60');
+      background-size: cover; background-blend-mode: screen; background-position: center;
+      padding: 10px 10px 20px; font-size: 17px; line-height: 1.6; color: #1a1a1a; position: relative;
+    }
+    .note-torn::after {
+      content: ''; position: absolute; top: 100%; left: 0; width: 100%; height: 20px;
+      background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/23618/rip.svg') bottom;
+      background-size: 45%; pointer-events: none;
+    }
+    .note-author { font-size: 12px; color: #6b4c2a; letter-spacing: 0.5px; margin-top: 6px; text-align: right; font-style: italic; }
+    .note-pin { width: 10px; height: 10px; border-radius: 50%; position: absolute; top: -5px; left: 50%; transform: translateX(-50%); box-shadow: 1px 1px 2px rgba(0,0,0,0.4); z-index: 2; }
+    .note-delete { position: absolute; top: 4px; right: 4px; background: none; border: none; font-size: 15px; color: #161616; padding: 0; line-height: 1; opacity: 0; transition: opacity 0.2s; }
+    .pinned-note:hover .note-delete { opacity: 1; }
+    .note-delete:hover { color: #cc2222; }
+
+    .post-note-btn {
+      position: absolute; top: 100px; left: 18px; z-index: 10;
+      background: rgba(16,53,60,0.92);
+      border: 2px solid #c4a040;
+      padding: 10px 22px;
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: clamp(11px, 1vw, 15px); letter-spacing: 1.5px;
+      color: #c4a040;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.35);
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .post-note-btn:hover {
+      background: rgba(16,53,60,0.92);
+      color: #c4a040;
+      border-color: #c4a040;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.35);
+    }
+
+    .modal-overlay, .event-popup, .add-event-popup {
+      display: none; position: fixed; inset: 0;
+      background: rgba(20,10,0,0.75);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open, .event-popup.open, .add-event-popup.open { display: flex; }
+    .modal-overlay   { z-index: 999; }
+    .event-popup     { z-index: 998; }
+    .add-event-popup { z-index: 999; }
+
+    .modal-box,
+    .event-box,
+    .add-event-box {
+      position: relative;
+      background: var(--da-cream);
+      border: 3px solid var(--da-gold);
+      border-radius: 4px;
+      box-shadow: 0 18px 50px rgba(59,47,47,0.45);
+      cursor: default;
+    }
+    .modal-box::before,
+    .event-box::before,
+    .add-event-box::before {
+      content: '';
+      position: absolute;
+      top: 6px; bottom: 6px; left: 6px; right: 6px;
+      border: 1px solid var(--da-gold);
+      pointer-events: none;
+    }
+    .modal-box::after,
+    .event-box::after,
+    .add-event-box::after {
+      content: '';
+      position: absolute;
+      top: -3px; bottom: -3px; left: -3px; right: -3px;
+      background-image:
+        linear-gradient(var(--da-gold), var(--da-gold)),
+        linear-gradient(var(--da-gold), var(--da-gold)),
+        linear-gradient(var(--da-gold), var(--da-gold)),
+        linear-gradient(var(--da-gold), var(--da-gold));
+      background-position: top left, top right, bottom left, bottom right;
+      background-size: 10px 10px;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+
+    .modal-box {
+  padding: 16px 20px;
+  width: min(480px, 88vw);
+  max-height: none;
+  overflow: visible;
+}
+    .event-box     { max-width: 480px; width: min(92vw, 480px); padding: 26px 28px; }
+    .add-event-box { padding: 22px 24px; }
+
+    .modal-title {
+      font-size: 19px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--da-brown); margin: 0 0 18px;
+      border-bottom: 1px solid var(--da-gold); padding-bottom: 10px;
+    }
+    .modal-label { font-size: 13px; color: var(--da-brown); letter-spacing: 1px; display: block; margin: 0 0 6px; }
+    .modal-input, .modal-textarea {
+      width: 100%; border: 1px solid var(--da-gold);
+      background: #fdf8ef; color: var(--da-brown);
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: 19px; padding: 10px 12px;
+      border-radius: 2px; outline: none; margin-bottom: 14px;
+    }
+    .modal-textarea { height: 120px; resize: none; }
+    .modal-input:focus, .modal-textarea:focus { border-color: var(--da-oxblood); }
+    .modal-row { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+
+    .style-btn {
+      flex: 1; min-width: 60px;
+      border: 1px solid var(--da-gold);
+      background: #fdf8ef; color: var(--da-brown);
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: 12px; letter-spacing: 0.6px;
+      padding: 8px 6px; border-radius: 2px; text-align: center;
+      transition: background 0.15s;
+    }
+    .style-btn.selected, .style-btn:hover { background: var(--da-brown); color: var(--da-gold); border-color: var(--da-brown); }
+
+    .font-picker { position: relative; width: 100%; margin-bottom: 16px; }
+    .font-picker-trigger {
+      width: 100%; height: 50px;
+      border: 1px solid var(--da-gold);
+      background: #fdf8ef; color: var(--da-brown);
+      font-size: 22px; padding: 8px 12px;
+      border-radius: 2px; text-align: left;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .font-picker-trigger:focus { border-color: var(--da-oxblood); outline: none; }
+    .font-picker-arrow { font-size: 13px; opacity: 0.55; flex-shrink: 0; font-family: sans-serif; }
+    .font-picker-dropdown {
+      display: none; position: absolute; top: 100%; left: 0; right: 0;
+      background: #fdf8ef;
+      border: 1px solid var(--da-gold); border-top: none;
+      border-radius: 0 0 2px 2px;
+      max-height: 240px; overflow-y: auto;
+      z-index: 200;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+    }
+    .font-picker-dropdown.open { display: block; }
+    .font-picker-option {
+      padding: 9px 14px;
+      font-size: 22px;
+      color: var(--da-brown);
+      border-bottom: 1px solid rgba(176,141,87,0.18);
+    }
+    .font-picker-option:last-child { border-bottom: none; }
+    .font-picker-option:hover { background: rgba(176,141,87,0.15); }
+    .font-picker-option.selected { background: rgba(176,141,87,0.28); }
+
+    .color-row { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
+    .color-swatch {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid rgba(59,47,47,0.35);
+      box-shadow: none;
+      transition: border-color 0.15s, box-shadow 0.15s, outline-color 0.15s;
+    }
+    .color-swatch.selected {
+      border: 3px solid var(--da-gold);
+      outline: 2px solid var(--da-brown);
+      outline-offset: 2px;
+      box-shadow:
+        0 0 0 2px rgba(176,141,87,0.35),
+        0 0 8px rgba(176,141,87,0.65);
+    }
+
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-btn {
+      border: 1px solid var(--da-gold); background: #fdf8ef; color: var(--da-brown);
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+      padding: 9px 18px; border-radius: 2px;
+    }
+    .modal-btn.primary { background: var(--da-brown); color: var(--da-gold); border-color: var(--da-brown); }
+    .modal-btn:hover { opacity: 0.85; }
+
+    .note-enlarged-overlay { display: none; position: absolute; inset: 0; background: rgba(59,47,47,0.78); z-index: 997; align-items: center; justify-content: center; }
+    .note-enlarged-overlay.open { display: flex; }
+    .note-enlarged-inner { transform: scale(1.8); transform-origin: center center; position: relative; max-width: 220px; filter: drop-shadow(4px 6px 16px rgba(0,0,0,0.6)); }
+
+    .event-color-bar { width: 100%; height: 3px; border-radius: 2px; margin-bottom: 10px; }
+    .event-box-title { font-size: 24px; color: var(--da-brown); font-weight: bold; margin: 0 0 6px; }
+    .event-box-date  { font-size: 14px; color: var(--da-gold); letter-spacing: 1px; text-transform: uppercase; margin: 0 0 14px; }
+    .event-box-desc  { font-size: 17px; color: var(--da-brown); line-height: 1.7; margin: 0 0 16px; }
+    .event-box-close {
+      background: var(--da-brown); color: var(--da-gold); border: none;
+      padding: 8px 16px; font-family: inherit; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+     border-radius: 2px;
+    }
+    .event-box-close:hover { background: var(--da-gold); color: var(--da-brown); }
+
+    .add-event-box-title {
+      font-size: 16px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--da-brown); margin: 0 0 14px;
+      border-bottom: 1px solid var(--da-gold); padding-bottom: 8px;
+    }
+    .add-event-input, .add-event-textarea {
+      width: 100%; border: 1px solid var(--da-gold);
+      background: #fdf8ef; color: var(--da-brown);
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: 14px; padding: 9px 11px;
+      border-radius: 2px; outline: none; margin-bottom: 10px;
+    }
+    .add-event-textarea { height: 92px; resize: none; }
+    .add-event-input:focus, .add-event-textarea:focus { border-color: var(--da-oxblood); }
+    .add-event-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+    .add-event-btn {
+      border: 1px solid var(--da-gold); background: #fdf8ef; color: var(--da-brown);
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+      padding: 8px 16px; border-radius: 2px;
+    }
+    .add-event-btn.primary { background: var(--da-brown); color: var(--da-gold); }
+    .add-event-btn:hover { opacity: 0.85; }
+
+    .payme_post {
+   position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  left: 92%;
+  top: 85%;
+  width: clamp(90px, 10vw, 134px);
+
+}
+
+.get_well_soon {
+  position: absolute;
+  z-index: 4;
+  left: 0%;
+  top: 77%;
+  width: clamp(160px, 20vw, 253px);
+  transform: rotate(-3deg);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), filter 0.2s;
+}
+.get_well_soon:hover {
+  transform: rotate(-1deg) scale(1.04);
+  filter: drop-shadow(3px 6px 14px rgba(0,0,0,0.5));
+}
+
+
+    /* ── Get Well Soon card popup ── */
+    .card-popup-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(20,10,0,0.82);
+      align-items: center; justify-content: center;
+      z-index: 998;
+    }
+    .card-popup-overlay.open { display: flex; }
+
+    .card-popup-box {
+      position: relative;
+      background: var(--da-cream);
+      border: 3px solid var(--da-gold);
+      border-radius: 4px;
+      box-shadow: 0 18px 50px rgba(59,47,47,0.55);
+      width: min(680px, 94vw);
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .card-popup-box::before {
+      content: '';
+      position: absolute;
+      top: 6px; bottom: 6px; left: 6px; right: 6px;
+      border: 1px solid var(--da-gold);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .card-popup-box::after {
+      content: '';
+      position: absolute;
+      top: -3px; bottom: -3px; left: -3px; right: -3px;
+      background-image:
+        linear-gradient(var(--da-gold), var(--da-gold)),
+        linear-gradient(var(--da-gold), var(--da-gold)),
+        linear-gradient(var(--da-gold), var(--da-gold)),
+        linear-gradient(var(--da-gold), var(--da-gold));
+      background-position: top left, top right, bottom left, bottom right;
+      background-size: 10px 10px;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+
+    .card-popup-header {
+      background: var(--da-brown);
+      color: var(--da-gold);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .card-popup-close {
+      background: none; border: none;
+      color: var(--da-gold); font-size: 18px;
+      line-height: 1; padding: 0 4px;
+    }
+    .card-popup-close:hover { color: var(--da-cream); }
+
+    .card-popup-content {
+      overflow-y: auto;
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .card-popup-img {
+      width: 100%;
+      display: block;
+      border: 2px solid rgba(176,141,87,0.35);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      border-radius: 2px;
+    }
+
+    .card-signatures-area {
+      width: 100%;
+      background: #fdf8ef;
+      border: 1px solid rgba(176,141,87,0.4);
+      border-radius: 2px;
+      padding: 14px 16px;
+    }
+    .card-signatures-heading {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--da-brown);
+      margin: 0 0 12px;
+      border-bottom: 1px solid rgba(176,141,87,0.4);
+      padding-bottom: 8px;
+    }
+    .card-signatures-empty {
+      font-style: italic;
+      color: #8a7a6a;
+      font-size: 13px;
+      text-align: center;
+      padding: 8px 0;
+    }
+    .card-signature-item {
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(176,141,87,0.3);
+      position: relative;
+    }
+    .card-signature-item:last-child { border-bottom: none; }
+    .card-sig-message {
+      font-size: 26px;
+      color: #1a1a1a;
+      line-height: 1.45;
+      margin-bottom: 4px;
+    }
+    .card-sig-author {
+      font-size: 18px;
+      color: #6b4c2a;
+      text-align: right;
+      font-style: italic;
+    }
+    .card-sig-delete {
+      background: none; border: none;
+      color: #bbb; font-size: 11px;
+      padding: 0; letter-spacing: 0.5px;
+      position: absolute; top: 10px; right: 0;
+      opacity: 0; transition: opacity 0.15s;
+    }
+    .card-signature-item:hover .card-sig-delete { opacity: 1; }
+    .card-sig-delete:hover { color: #cc2222; }
+
+    .card-popup-footer {
+      flex-shrink: 0;
+      padding: 14px 20px;
+      border-top: 1px solid rgba(176,141,87,0.35);
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+    }
+    .sign-card-btn {
+      background: var(--da-brown);
+      color: var(--da-gold);
+      border: 2px solid var(--da-gold);
+      padding: 11px 28px;
+      font-family: 'Palatino Linotype', Palatino, serif;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      border-radius: 2px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .sign-card-btn:hover { background: var(--da-gold); color: var(--da-brown); }
+
+    /* Sign card sub-modal — sits above card popup */
+    .sign-card-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(20,10,0,0.55);
+      align-items: center; justify-content: center;
+      z-index: 1001;
+    }
+    .sign-card-overlay.open { display: flex; }
+  </style>
+</head>
+<body>
+
+<div class="notice-panel">
+  <img class="notice-board-bg" src="../Notices/notice_board.png" alt="" aria-hidden="true">
+
+    <img class="payme_post" src="../Notices/payme_post it.png" alt="">
+
+    <img class="get_well_soon" src="../Notices/get_well_soon.png" alt="">
+
+  
+
+  <div class="loading-msg" id="loading-msg">Loading board...</div>
+  <div id="notes-container"></div>
+
+  <div class="note-enlarged-overlay" id="note-enlarged-overlay">
+    <div class="note-enlarged-inner" id="note-enlarged-inner"></div>
+  </div>
+
+  <div class="photo-enlarged-overlay" id="photo-enlarged-overlay">
+    <img class="photo-enlarged-img" id="photo-enlarged-img" src="../Notices/nudie.png" alt="The Boneport">
+  </div>
+
+  
+  <div class="mag-outer" id="mag-outer">
+    <div class="mag-pin" id="mag-pin"></div>
+    <div class="mag-wrap">
+      <div class="mag-header">
+        <span class="mag-header-title">The Boneport Centerfold</span>
+        <span class="mag-header-issue">Vol. XII · No. 4</span>
+      </div>
+      <div class="mag-photo-wrap">
+        <div class="mag-photo">
+          <img src="../Notices/nudie.png" alt="The Boneport">
+        </div>
+        <div class="mag-crease-bottom"></div>
+      </div>
+      <div class="cal-section">
+        <div class="cal-crease-top"></div>
+        <div class="cal-section-header">
+          <p class="cal-month" id="cal-month-name">Eyre · 1010 YK</p>
+          <p class="cal-year">Throneport, Karrnath · <span id="cal-season-label">Late Spring</span></p>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-days-header">
+            <div class="cal-day-name">Sul</div><div class="cal-day-name">Mol</div>
+            <div class="cal-day-name">Zol</div><div class="cal-day-name">Wir</div>
+            <div class="cal-day-name">Zor</div><div class="cal-day-name">Far</div>
+            <div class="cal-day-name">Sar</div>
+          </div>
+          <div class="cal-days" id="cal-days"></div>
+        </div>
+        <div class="cal-footer" id="cal-week-label">Calendar of Galifar</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="post-note-btn" id="post-note-btn" type="button">+ Pin a Note</button>
+</div>
+
+<!-- Get Well Soon Card Popup -->
+<div class="card-popup-overlay" id="card-popup-overlay">
+  <div class="card-popup-box">
+    <div class="card-popup-header">
+      <span>Garrick's Get Well Soon Card</span>
+      <button class="card-popup-close" id="card-popup-close">✕</button>
+    </div>
+    <div class="card-popup-content">
+      <img class="card-popup-img" src="../Notices/open_gws.png" alt="Get Well Soon Card for Garrick">
+      <div class="card-signatures-area">
+        <p class="card-signatures-heading">Messages on the card</p>
+        <div id="card-signatures-list"></div>
+      </div>
+    </div>
+    <div class="card-popup-footer">
+      <button class="sign-card-btn" id="sign-card-btn">✍ Sign your name and add a message</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sign Card Sub-Modal -->
+<div class="sign-card-overlay" id="sign-card-overlay">
+  <div class="modal-box">
+    <p class="modal-title">Sign Garrick's Card</p>
+    <label class="modal-label">Your name</label>
+    <input class="modal-input" id="sign-card-name" type="text" placeholder="e.g. Bai, Xander, Marcy...">
+    <label class="modal-label">Your message</label>
+    <textarea class="modal-textarea" id="sign-card-message" placeholder="Write something for Garrick..."></textarea>
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="modal-btn" id="sign-card-cancel">Cancel</button>
+      <button class="modal-btn primary" id="sign-card-submit">Sign the card</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="compose-modal">
+  <div class="modal-box">
+    <p class="modal-title">Pin a Note</p>
+    <label class="modal-label">Your name</label>
+    <input class="modal-input" id="note-author" type="text" placeholder="e.g. Bai, Garrick, Xander...">
+    <label class="modal-label">Message</label>
+    <textarea class="modal-textarea" id="note-text" placeholder="What do you want to pin?"></textarea>
+    <label class="modal-label">Note style</label>
+    <div class="modal-row">
+      <button class="style-btn selected" data-style="index">Index card</button>
+      <button class="style-btn" data-style="sticky">Sticky note</button>
+      <button class="style-btn" data-style="torn">Torn paper</button>
+    </div>
+    <label class="modal-label">Font</label>
+    <div class="font-picker" id="font-picker">
+      <button class="font-picker-trigger" id="font-picker-trigger" type="button">
+        <span id="font-picker-label">Beth Ellen</span>
+        <span class="font-picker-arrow">▾</span>
+      </button>
+      <div class="font-picker-dropdown" id="font-picker-dropdown"></div>
+    </div>
+    <div id="color-row-wrap">
+      <label class="modal-label">Color</label>
+      <div class="color-row">
+        <div class="color-swatch selected" data-color="yellow" style="background:#fef08a;" title="Yellow"></div>
+        <div class="color-swatch" data-color="pink"   style="background:#fbcfe8;" title="Pink"></div>
+        <div class="color-swatch" data-color="blue"   style="background:#bae6fd;" title="Blue"></div>
+        <div class="color-swatch" data-color="green"  style="background:#bbf7d0;" title="Green"></div>
+      </div>
+    </div>
+    <label class="modal-label">Pin colour</label>
+    <div class="color-row">
+      <div class="color-swatch selected" data-pin="red"   style="background:#cc2222;" title="Red"></div>
+      <div class="color-swatch" data-pin="gold"  style="background:#c4a040;" title="Gold"></div>
+      <div class="color-swatch" data-pin="green" style="background:#2a7a2a;" title="Green"></div>
+      <div class="color-swatch" data-pin="blue"  style="background:#1a4a8a;" title="Blue"></div>
+    </div>
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="modal-btn" id="cancel-btn">Cancel</button>
+      <button class="modal-btn primary" id="submit-btn">Pin it</button>
+    </div>
+  </div>
+</div>
+
+<div class="add-event-popup" id="add-event-popup">
+  <div class="add-event-box">
+    <p class="add-event-box-title" id="add-event-popup-title">Add Event</p>
+    <input class="add-event-input" id="add-event-name" type="text" placeholder="Event name...">
+    <input class="add-event-input" id="add-event-org"  type="text" placeholder="Organisation (optional)...">
+    <textarea class="add-event-textarea" id="add-event-desc" placeholder="Description..."></textarea>
+    <div class="add-event-actions">
+      <button class="add-event-btn" id="add-event-cancel">Cancel</button>
+      <button class="add-event-btn primary" id="add-event-submit">Add Event</button>
+    </div>
+  </div>
+</div>
+
+<div class="event-popup" id="event-popup">
+  <div class="event-box">
+    <div class="event-color-bar" id="popup-bar"></div>
+    <p class="event-box-title" id="popup-title"></p>
+    <p class="event-box-date"  id="popup-date"></p>
+    <p class="event-box-desc"  id="popup-desc"></p>
+    <button class="event-box-close" onclick="document.getElementById('event-popup').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp }                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, push, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyCRUXH5cVOowOFwxPRiUwnbkv0HBPpQRSk",
+  authDomain:        "bai-detective-agency.firebaseapp.com",
+  databaseURL:       "https://bai-detective-agency-default-rtdb.firebaseio.com",
+  projectId:         "bai-detective-agency",
+  storageBucket:     "bai-detective-agency.firebasestorage.app",
+  messagingSenderId: "1092382290002",
+  appId:             "1:1092382290002:web:ac35b97fa10d3541742f8b"
+};
+
+const app       = initializeApp(firebaseConfig);
+const db        = getDatabase(app);
+const notesRef  = ref(db, 'notice-board/notes');
+const eventsRef = ref(db, 'notice-board/custom-events');
+
+const OWNED_NOTE_KEYS_STORAGE  = 'notice-board-owned-note-keys';
+const OWNED_EVENT_KEYS_STORAGE = 'notice-board-owned-event-keys';
+const AUTHOR_NAME_STORAGE      = 'notice-board-author-name';
+
+let customEvents = {};
+
+function loadOwnedKeys(storageKey) {
+  try {
+    const stored = localStorage.getItem(storageKey);
+    const parsed = stored ? JSON.parse(stored) : [];
+    return Array.isArray(parsed) ? parsed.filter(k => typeof k === 'string') : [];
+  } catch { return []; }
+}
+function saveOwnedKeys(storageKey, set) {
+  try { localStorage.setItem(storageKey, JSON.stringify([...set])); } catch {}
+}
+
+const MY_NOTE_KEYS  = new Set(loadOwnedKeys(OWNED_NOTE_KEYS_STORAGE));
+const MY_EVENT_KEYS = new Set(loadOwnedKeys(OWNED_EVENT_KEYS_STORAGE));
+
+function rememberOwnedNoteKey(key)  { MY_NOTE_KEYS.add(key);  saveOwnedKeys(OWNED_NOTE_KEYS_STORAGE, MY_NOTE_KEYS); }
+function forgetOwnedNoteKey(key)    { MY_NOTE_KEYS.delete(key); saveOwnedKeys(OWNED_NOTE_KEYS_STORAGE, MY_NOTE_KEYS); }
+function rememberOwnedEventKey(key) { MY_EVENT_KEYS.add(key); saveOwnedKeys(OWNED_EVENT_KEYS_STORAGE, MY_EVENT_KEYS); }
+function forgetOwnedEventKey(key)   { MY_EVENT_KEYS.delete(key); saveOwnedKeys(OWNED_EVENT_KEYS_STORAGE, MY_EVENT_KEYS); }
+
+function loadSavedAuthorName() {
+  try { return localStorage.getItem(AUTHOR_NAME_STORAGE) || ''; } catch { return ''; }
+}
+function saveAuthorName(name) {
+  try { localStorage.setItem(AUTHOR_NAME_STORAGE, name); } catch {}
+}
+function normalizedName(value) { return String(value || '').trim().toLowerCase(); }
+
+function isOwnedByCurrentAuthor(key, author) {
+  const saved = loadSavedAuthorName();
+  return MY_NOTE_KEYS.has(key) || (normalizedName(saved) !== '' && normalizedName(author) === normalizedName(saved));
+}
+
+const POSITIONS = [
+  { left:'38%', top:'8%',  rot:2  }, { left:'55%', top:'5%',  rot:-3 },
+  { left:'68%', top:'12%', rot:1  }, { left:'42%', top:'42%', rot:-2 },
+  { left:'58%', top:'48%', rot:3  }, { left:'30%', top:'55%', rot:-1 },
+  { left:'48%', top:'65%', rot:2  }, { left:'65%', top:'58%', rot:-3 },
+  { left:'72%', top:'38%', rot:1  }, { left:'35%', top:'72%', rot:-2 },
+  { left:'60%', top:'72%', rot:2  }, { left:'75%', top:'65%', rot:-1 },
+];
+
+const PIN_COLORS    = { red:'#cc2222', gold:'#c4a040', green:'#2a7a2a', blue:'#1a4a8a' };
+const STICKY_COLORS = { yellow:'#fef08a', pink:'#fbcfe8', blue:'#bae6fd', green:'#bbf7d0' };
+
+const FONT_OPTIONS = [
+  { key:'beth-ellen', label:'Beth Ellen', family:"'Beth Ellen', cursive" },
+  { key:'bestie-seventy', label:'Bestie Seventy', family:"'Bestie Seventy', cursive" },
+  { key:'beverly-sage', label:'Beverly Sage', family:"'Beverly Sage', cursive" },
+  { key:'crustaceans-signature', label:'Crustaceans Signature', family:"'Crustaceans Signature', cursive" },
+  { key:'fighter-attack', label:'Fighter Attack', family:"'Fighter Attack', fantasy" },
+  { key:'gathenia', label:'Gathenia', family:"'Gathenia', cursive" },
+  { key:'humble-signation', label:'Humble Signation', family:"'Humble Signation', cursive" },
+  { key:'jalliya', label:'Jalliya', family:"'Jalliya', cursive" },
+  { key:'rawrote-demo', label:'Rawrote Demo', family:"'Rawrote Demo', cursive" },
+  { key:'rockybilly', label:'Rockybilly', family:"'Rockybilly', cursive" },
+  { key:'samarata', label:'Samarata', family:"'Samarata', cursive" },
+  { key:'scribble-markers', label:'Scribble Markers', family:"'Scribble Markers', cursive" },
+  { key:'signatie', label:'Signatie', family:"'Signatie', cursive" },
+  { key:'vanilla-cream', label:'Vanilla Cream', family:"'Vanilla Cream', cursive" },
+  { key:'wild-favour', label:'Wild Favour', family:"'Wild Favour', cursive" },
+];
+const FONT_FAMILY_BY_KEY = Object.fromEntries(FONT_OPTIONS.map(o => [o.key, o.family]));
+function getNoteFontFamily(fontKey) { return FONT_FAMILY_BY_KEY[fontKey] || "'Palatino Linotype', Palatino, serif"; }
+
+function positionForKey(key) {
+  let hash = 0;
+  for (const c of key) hash = (hash * 31 + c.charCodeAt(0)) & 0xfffffff;
+  return POSITIONS[hash % POSITIONS.length];
+}
+function positionForNote(key, data) {
+  const fallback = positionForKey(key);
+  return {
+    left: data.left || fallback.left,
+    top:  data.top  || fallback.top,
+    rot:  Number.isFinite(data.rot) ? data.rot : fallback.rot,
+  };
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function buildNoteMarkup(data) {
+  const fontFamily = getNoteFontFamily(data.font);
+  if (data.style === 'sticky') {
+    const bg = STICKY_COLORS[data.color] || '#fef08a';
+    return `<div class="note-sticky" style="background:${bg}; font-family:${fontFamily};">
+      <div>${escHtml(data.text)}</div>
+      <div class="note-author">— ${escHtml(data.author)}</div>
+    </div>`;
+  }
+  if (data.style === 'torn') {
+    return `<div class="note-torn" style="font-family:${fontFamily};">
+      <div>${escHtml(data.text)}</div>
+      <div class="note-author">— ${escHtml(data.author)}</div>
+    </div>`;
+  }
+  return `<div class="note-index" style="font-family:${fontFamily};">
+    <div class="note-lines">${escHtml(data.text)}</div>
+    <div class="note-author">— ${escHtml(data.author)}</div>
+  </div>`;
+}
+
+function makeDraggable(el) {
+  let startX, startY, startLeft, startTop, isDragging = false;
+
+  el.addEventListener('mousedown', e => {
+    if (e.target.closest('.note-delete')) return;
+    e.preventDefault();
+
+    const panel    = document.querySelector('.notice-panel').getBoundingClientRect();
+    const noteRect = el.getBoundingClientRect();
+    const key      = el.id.replace('note-', '');
+    const noteRef  = ref(db, 'notice-board/notes/' + key);
+
+    startX    = e.clientX;
+    startY    = e.clientY;
+    startLeft = noteRect.left - panel.left;
+    startTop  = noteRect.top  - panel.top;
+    isDragging = false;
+    el.style.zIndex = '50';
+    el.classList.add('dragging');
+    document.body.classList.add('is-dragging-note');
+
+    function onMove(e) {
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) isDragging = true;
+
+      const maxLeft = Math.max(0, panel.width  - noteRect.width);
+      const maxTop  = Math.max(0, panel.height - noteRect.height);
+      el.style.left      = Math.min(Math.max(0, startLeft + dx), maxLeft) + 'px';
+      el.style.top       = Math.min(Math.max(0, startTop  + dy), maxTop)  + 'px';
+      el.style.transform = 'rotate(2deg)';
+    }
+
+    function onUp() {
+      el.style.zIndex = '6';
+      el.classList.remove('dragging');
+      document.body.classList.remove('is-dragging-note');
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup',   onUp);
+      if (!isDragging) return;
+
+      const finalLeft = parseFloat(el.style.left) || startLeft;
+      const finalTop  = parseFloat(el.style.top)  || startTop;
+      const leftPct   = panel.width  ? ((finalLeft / panel.width)  * 100).toFixed(2) + '%' : el.style.left;
+      const topPct    = panel.height ? ((finalTop  / panel.height) * 100).toFixed(2) + '%' : el.style.top;
+      const pos       = positionForNote(key, {});
+
+      update(noteRef, { left: leftPct, top: topPct, rot: pos.rot });
+      el.style.transform = `rotate(${pos.rot}deg)`;
+    }
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup',   onUp);
+
+    el.addEventListener('click', e => {
+      if (isDragging) { e.stopImmediatePropagation(); isDragging = false; }
+    }, { once: true });
+  });
+}
+
+function renderNote(key, data) {
+  const pos     = positionForNote(key, data);
+  const wrapper = document.createElement('div');
+  const isOwner = isOwnedByCurrentAuthor(key, data.author);
+
+  wrapper.className     = 'pinned-note' + (isOwner ? ' mine' : '');
+  wrapper.id            = 'note-' + key;
+  wrapper.style.cssText = `left:${pos.left}; top:${pos.top}; transform:rotate(${pos.rot}deg);`;
+  wrapper.title         = isOwner ? 'Drag to move · click to read' : 'Click to read';
+  wrapper.innerHTML     = buildNoteMarkup(data);
+
+  const pinEl = document.createElement('div');
+  pinEl.className        = 'note-pin';
+  pinEl.style.background = PIN_COLORS[data.pin] || '#cc2222';
+  wrapper.appendChild(pinEl);
+
+  if (isOwner) {
+    const delBtn = document.createElement('button');
+    delBtn.className   = 'note-delete';
+    delBtn.textContent = '✕';
+    delBtn.title       = 'Remove this note';
+    delBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (confirm('Remove this note from the board?')) {
+        forgetOwnedNoteKey(key);
+        remove(ref(db, 'notice-board/notes/' + key));
+      }
+    });
+    wrapper.appendChild(delBtn);
+  }
+
+  wrapper.addEventListener('click', e => {
+    if (e.target.closest('.note-delete')) return;
+    const clone = wrapper.cloneNode(true);
+    clone.style.cssText = 'position: static; transform: none;';
+    clone.classList.remove('mine');
+    const cd = clone.querySelector('.note-delete');
+    const cp = clone.querySelector('.note-pin');
+    if (cd) cd.remove();
+    if (cp) cp.remove();
+    const inner = document.getElementById('note-enlarged-inner');
+    inner.innerHTML = '';
+    inner.appendChild(clone);
+    document.getElementById('note-enlarged-overlay').classList.add('open');
+  });
+
+  if (isOwner) makeDraggable(wrapper);
+
+  document.getElementById('notes-container').appendChild(wrapper);
+}
+
+onValue(notesRef, snapshot => {
+  document.getElementById('loading-msg').style.display = 'none';
+  document.getElementById('notes-container').innerHTML = '';
+  snapshot.forEach(child => renderNote(child.key, child.val()));
+});
+
+document.getElementById('note-enlarged-overlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+let selectedStyle = 'index';
+let selectedColor = 'yellow';
+let selectedPin   = 'red';
+let selectedFont  = 'beth-ellen';
+
+function syncComposeTextareaStyle() {
+  const noteText = document.getElementById('note-text');
+  noteText.style.fontFamily = getNoteFontFamily(selectedFont);
+
+  if (selectedStyle === 'sticky') {
+    noteText.style.background = STICKY_COLORS[selectedColor] || '#fef08a';
+    return;
+  }
+  if (selectedStyle === 'torn') {
+    noteText.style.backgroundImage = "url('https://images.unsplash.com/photo-1524312966005-030e396636fd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjF8fG9sZCUyMHBhcGVyfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60')";
+    noteText.style.backgroundSize = 'cover';
+    noteText.style.backgroundPosition = 'center';
+    return;
+  }
+  noteText.style.backgroundImage = 'none';
+  noteText.style.backgroundColor = '#fdf8ef';
+  noteText.style.backgroundSize = '';
+  noteText.style.backgroundPosition = '';
+}
+
+function buildFontPicker() {
+  const trigger  = document.getElementById('font-picker-trigger');
+  const label    = document.getElementById('font-picker-label');
+  const dropdown = document.getElementById('font-picker-dropdown');
+
+  function selectFont(key) {
+    selectedFont = key;
+    const opt = FONT_OPTIONS.find(o => o.key === key) || FONT_OPTIONS[0];
+    label.textContent = opt.label;
+    label.style.fontFamily = opt.family;
+    dropdown.querySelectorAll('.font-picker-option').forEach(o =>
+      o.classList.toggle('selected', o.dataset.value === key)
+    );
+    syncComposeTextareaStyle();
+  }
+
+  FONT_OPTIONS.forEach(option => {
+    const div = document.createElement('div');
+    div.className = 'font-picker-option' + (option.key === selectedFont ? ' selected' : '');
+    div.dataset.value = option.key;
+    div.textContent = option.label;
+    div.style.fontFamily = option.family;
+    div.addEventListener('click', () => {
+      selectFont(option.key);
+      dropdown.classList.remove('open');
+    });
+    dropdown.appendChild(div);
+  });
+
+  selectFont(selectedFont);
+
+  trigger.addEventListener('click', e => {
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => dropdown.classList.remove('open'));
+}
+
+document.querySelectorAll('.style-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedStyle = btn.dataset.style;
+    document.getElementById('color-row-wrap').style.display = selectedStyle === 'sticky' ? '' : 'none';
+    syncComposeTextareaStyle();
+  });
+});
+
+document.querySelectorAll('[data-color]').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('[data-color]').forEach(s => s.classList.remove('selected'));
+    sw.classList.add('selected');
+    selectedColor = sw.dataset.color;
+    syncComposeTextareaStyle();
+  });
+});
+
+document.querySelectorAll('[data-pin]').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('[data-pin]').forEach(s => s.classList.remove('selected'));
+    sw.classList.add('selected');
+    selectedPin = sw.dataset.pin;
+  });
+});
+
+document.getElementById('post-note-btn').addEventListener('click', () => {
+  document.getElementById('compose-modal').classList.add('open');
+  syncComposeTextareaStyle();
+});
+
+document.getElementById('cancel-btn').addEventListener('click', () => {
+  document.getElementById('compose-modal').classList.remove('open');
+});
+
+document.getElementById('submit-btn').addEventListener('click', () => {
+  const author = document.getElementById('note-author').value.trim();
+  const text   = document.getElementById('note-text').value.trim();
+  if (!author) { alert('Please enter your name.'); return; }
+  if (!text)   { alert('Please write a message.'); return; }
+
+  saveAuthorName(author);
+
+  push(notesRef, { author, text, style: selectedStyle, color: selectedColor, pin: selectedPin, font: selectedFont, ts: Date.now() })
+    .then(newRef => rememberOwnedNoteKey(newRef.key));
+
+  document.getElementById('note-text').value = '';
+  document.getElementById('compose-modal').classList.remove('open');
+});
+
+document.getElementById('note-author').value = loadSavedAuthorName();
+buildFontPicker();
+syncComposeTextareaStyle();
+
+document.getElementById('compose-modal').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+const magPhotoWrap = document.querySelector('.mag-photo-wrap');
+const magPhoto     = document.querySelector('.mag-photo');
+magPhoto.addEventListener('click', e => {
+  e.stopPropagation();
+  document.getElementById('photo-enlarged-overlay').classList.add('open');
+});
+
+document.getElementById('photo-enlarged-overlay').addEventListener('click', function(e) {
+  this.classList.remove('open');
+});
+
+const CURRENT_YEAR  = 1010;
+const CURRENT_MONTH = 4;
+const CURRENT_DAY   = 13;
+const CAL_SEED      = 208785417;
+
+const MONTH_NAMES = ['Zarantyr','Olarune','Therendor','Eyre','Dravago','Nymm','Lharvion','Barrakas','Rhaan','Sypheros','Aryth','Vult'];
+const SEASON_DATA = [
+  { name:'Deep Winter',  months:[12,1],  tempBase:-2,  icons:['❄','🌨','⛅','❄'],  flavours:['Bitter cold off the bay','Ice on the cobblestones','Frost at dawn'] },
+  { name:'Late Winter',  months:[2],     tempBase:2,   icons:['🌧','⛅','❄','🌦'], flavours:['Grey and cold','Cold wind off Karrn Bay','Icy gusts'] },
+  { name:'Early Spring', months:[3],     tempBase:8,   icons:['🌦','⛅','🌧','☀'], flavours:['Muddy underfoot','Fresh sea breeze','Still air'] },
+  { name:'Late Spring',  months:[4],     tempBase:13,  icons:['⛅','🌦','☀','🌧'], flavours:['Sea mist at dawn','Brisk wind off the bay','Fog rolling in'] },
+  { name:'Early Summer', months:[5],     tempBase:18,  icons:['☀','⛅','🌦','☀'],  flavours:['Warm southerly breeze','Light sea wind','Sunny spells'] },
+  { name:'High Summer',  months:[6,7],   tempBase:24,  icons:['☀','☀','⛅','🌦'],  flavours:['Hot and humid','Scorching by midday','Thunderstorms possible'] },
+  { name:'Late Summer',  months:[8],     tempBase:21,  icons:['☀','⛅','🌦','☀'],  flavours:['Cooling evenings','Clear and warm','Light breeze'] },
+  { name:'Early Autumn', months:[9],     tempBase:15,  icons:['⛅','🌦','🌧','☀'], flavours:['Leaves turning','Rain likely by evening','Overcast'] },
+  { name:'Late Autumn',  months:[10,11], tempBase:7,   icons:['🌧','⛅','🌦','☁'], flavours:['Cold rain','Gusts off Karrn Bay','Damp and cold'] },
+];
+
+const CAL_EVENTS = [
+  { day:11, name:"Initiation Day",  org:"The Silver Flame",           color:"#185FA5", desc:"Seminary graduations and breaking grounds for new churches. The Silver Flame recalls their declarations of independent faith and the construction of their first cathedral." },
+  { day:26, name:"Aureon's Crown",  org:"Sharn & The Sovereign Host", color:"#BA7517", desc:"The Sovereign Host celebrate knowledge with lectures and sermons. In Sharn, even non-devout members attend philosophical lectures held by priests of Aureon." },
+  { day:28, name:"Promisetide",     org:"The Silver Flame",           color:"#185FA5", desc:"The Purified honor the Silver Flame for the promise of paradise, and also honor — without worship — the Sovereign Host for having created the world." },
+];
+
+function seededRand(seed) {
+  let s = seed >>> 0;
+  return () => { s = (Math.imul(s,1664525)+1013904223)>>>0; return s/0x100000000; };
+}
+function getSeason(m) { return SEASON_DATA.find(s => s.months.includes(m)) || SEASON_DATA[3]; }
+function genWeather(y,m,d) {
+  const rand = seededRand((CAL_SEED^(y*397)^(m*53)^(d*7))>>>0);
+  const s    = getSeason(m);
+  const tC   = s.tempBase + Math.round((rand()-0.5)*8);
+  const tF   = Math.round(tC*9/5+32);
+  const icon = s.icons[Math.floor(rand()*s.icons.length)];
+  const flav = s.flavours[Math.floor(rand()*s.flavours.length)];
+  const cmap = {'☀':['Clear','Sunny'],'⛅':['Partly cloudy','Scattered cloud'],'🌦':['Showers','Passing showers'],'🌧':['Rain','Light rain'],'❄':['Snow','Light snow'],'🌨':['Sleet','Snow showers'],'☁':['Overcast','Grey skies']};
+  const cl   = cmap[icon] || ['Variable'];
+  return { icon, label:`${cl[Math.floor(rand()*cl.length)]} · ${tC}°C/${tF}°F · ${flav}` };
+}
+
+let addEventTargetDay = null;
+
+function openAddEventForm(day, monthName) {
+  addEventTargetDay = day;
+  document.getElementById('add-event-popup-title').textContent = 'Add Event — ' + day + ' ' + monthName;
+  document.getElementById('add-event-name').value = '';
+  document.getElementById('add-event-org').value  = '';
+  document.getElementById('add-event-desc').value = '';
+  document.getElementById('add-event-popup').classList.add('open');
+}
+
+function buildCalendar() {
+  const mn = MONTH_NAMES[CURRENT_MONTH - 1];
+  const s  = getSeason(CURRENT_MONTH);
+  const ws = Math.floor((CURRENT_DAY - 1) / 7) * 7 + 1;
+  const we = Math.min(ws + 6, 28);
+
+  document.getElementById('cal-month-name').textContent   = mn + ' · ' + CURRENT_YEAR + ' YK';
+  document.getElementById('cal-season-label').textContent = s.name;
+  document.getElementById('cal-week-label').textContent   = 'Calendar of Galifar · Week of ' + ws + '–' + we + ' ' + mn;
+
+  const grid = document.getElementById('cal-days');
+  grid.innerHTML = '';
+
+  for (let d = 1; d <= 28; d++) {
+    const ev  = CAL_EVENTS.find(e => e.day === d) || null;
+    const itw = d >= ws && d <= we;
+    const ito = d === CURRENT_DAY;
+    const w   = itw ? genWeather(CURRENT_YEAR, CURRENT_MONTH, d) : null;
+    const customEv = customEvents[d];
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (ito?' today':'') + (itw?' this-week':'') + (ev?' has-event':'') + (customEv?' custom-event':'');
+
+    const num = document.createElement('span');
+    num.textContent = d;
+    cell.appendChild(num);
+
+    if (w) {
+      const wi = document.createElement('div');
+      wi.className = 'weather-icon';
+      wi.textContent = w.icon;
+      const tt = document.createElement('div');
+      tt.className = 'weather-tooltip';
+      tt.textContent = w.label;
+      wi.appendChild(tt);
+      cell.appendChild(wi);
+
+      // Recalculate left/right anchoring each time it's shown, since display:none can't be measured
+      wi.addEventListener('mouseenter', () => {
+        tt.classList.remove('left-edge', 'right-edge');
+        tt.style.display = 'block';
+        const panelRect = document.querySelector('.notice-panel').getBoundingClientRect();
+        const ttRect    = tt.getBoundingClientRect();
+        if (ttRect.left < panelRect.left + 8) {
+          tt.classList.add('left-edge');
+        } else if (ttRect.right > panelRect.right - 8) {
+          tt.classList.add('right-edge');
+        }
+        tt.style.display = '';
+      });
+    }
+
+    if (ev) {
+      const dot = document.createElement('div');
+      dot.className = 'event-dot';
+      dot.style.background = ev.color;
+      cell.appendChild(dot);
+    }
+
+    cell.addEventListener('click', () => {
+      if (ev) {
+        document.getElementById('popup-title').textContent    = ev.name;
+        document.getElementById('popup-date').textContent     = d + ' ' + mn + ', ' + CURRENT_YEAR + ' YK · ' + ev.org;
+        document.getElementById('popup-desc').textContent     = ev.desc;
+        document.getElementById('popup-bar').style.background = ev.color;
+        document.getElementById('event-popup').classList.add('open');
+        return;
+      }
+
+      if (customEv) {
+        const isOwner   = MY_EVENT_KEYS.has(customEv.key);
+        const popupBox  = document.querySelector('.event-box');
+        const existingDel = document.getElementById('custom-event-delete');
+        if (existingDel) existingDel.remove();
+
+        document.getElementById('popup-title').textContent    = customEv.name;
+        document.getElementById('popup-date').textContent     = d + ' ' + mn + ', ' + CURRENT_YEAR + ' YK' + (customEv.org ? ' · ' + customEv.org : '');
+        document.getElementById('popup-desc').textContent     = customEv.desc || '';
+        document.getElementById('popup-bar').style.background = '#cc2222';
+
+        if (isOwner && popupBox) {
+          const delBtn = document.createElement('button');
+          delBtn.id = 'custom-event-delete';
+          delBtn.className = 'event-box-close';
+          delBtn.textContent = 'Delete Event';
+          delBtn.style.cssText = 'background:#7a1a0a; margin-right:auto;';
+          delBtn.addEventListener('click', () => {
+            if (confirm('Delete this event?')) {
+              forgetOwnedEventKey(customEv.key);
+              remove(ref(db, 'notice-board/custom-events/' + customEv.key));
+              document.getElementById('event-popup').classList.remove('open');
+            }
+          });
+          popupBox.prepend(delBtn);
+        }
+
+        document.getElementById('event-popup').classList.add('open');
+        return;
+      }
+
+      openAddEventForm(d, mn);
+    });
+
+    grid.appendChild(cell);
+  }
+}
+
+document.getElementById('event-popup').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+document.getElementById('add-event-cancel').addEventListener('click', () => {
+  document.getElementById('add-event-popup').classList.remove('open');
+});
+
+document.getElementById('add-event-submit').addEventListener('click', () => {
+  const name = document.getElementById('add-event-name').value.trim();
+  const org  = document.getElementById('add-event-org').value.trim();
+  const desc = document.getElementById('add-event-desc').value.trim();
+  if (!name) { alert('Please enter an event name.'); return; }
+
+  push(eventsRef, { day: addEventTargetDay, month: CURRENT_MONTH, year: CURRENT_YEAR, name, org, desc, ts: Date.now() })
+    .then(newRef => rememberOwnedEventKey(newRef.key));
+
+  document.getElementById('add-event-popup').classList.remove('open');
+});
+
+document.getElementById('add-event-popup').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+onValue(eventsRef, snapshot => {
+  customEvents = {};
+  snapshot.forEach(child => {
+    const data = child.val();
+    if (data.month === CURRENT_MONTH && data.year === CURRENT_YEAR) {
+      customEvents[data.day] = { ...data, key: child.key };
+    }
+  });
+  buildCalendar();
+});
+
+// ── Get Well Soon card ──────────────────────────────────────────
+const gwsRef = ref(db, 'notice-board/get-well-soon');
+const GWS_OWNED_STORAGE = 'notice-board-gws-signed-keys';
+const MY_GWS_KEYS = new Set(loadOwnedKeys(GWS_OWNED_STORAGE));
+function rememberGwsKey(key) { MY_GWS_KEYS.add(key); saveOwnedKeys(GWS_OWNED_STORAGE, MY_GWS_KEYS); }
+function forgetGwsKey(key)   { MY_GWS_KEYS.delete(key); saveOwnedKeys(GWS_OWNED_STORAGE, MY_GWS_KEYS); }
+
+function renderGwsSignatures(snapshot) {
+  const list = document.getElementById('card-signatures-list');
+  list.innerHTML = '';
+  if (!snapshot.exists()) {
+    list.innerHTML = '<p class="card-signatures-empty">No messages yet — be the first to sign!</p>';
+    return;
+  }
+  snapshot.forEach(child => {
+    const data = child.val();
+    const key = child.key;
+    const isOwner = MY_GWS_KEYS.has(key);
+    const fontFamily = getNoteFontFamily(data.font);
+
+    const item = document.createElement('div');
+    item.className = 'card-signature-item';
+
+    const msg = document.createElement('div');
+    msg.className = 'card-sig-message';
+    msg.style.fontFamily = fontFamily;
+    msg.textContent = data.message;
+
+    const auth = document.createElement('div');
+    auth.className = 'card-sig-author';
+    auth.style.fontFamily = fontFamily;
+    auth.textContent = '— ' + data.author;
+
+    item.appendChild(msg);
+    item.appendChild(auth);
+
+    if (isOwner) {
+      const delBtn = document.createElement('button');
+      delBtn.className = 'card-sig-delete';
+      delBtn.textContent = '✕ remove';
+      delBtn.addEventListener('click', () => {
+        if (confirm('Remove your message from the card?')) {
+          forgetGwsKey(key);
+          remove(ref(db, 'notice-board/get-well-soon/' + key));
+        }
+      });
+      item.appendChild(delBtn);
+    }
+
+    list.appendChild(item);
+  });
+}
+
+onValue(gwsRef, renderGwsSignatures);
+
+// Open card popup when image is clicked
+document.querySelector('.get_well_soon').addEventListener('click', () => {
+  document.getElementById('card-popup-overlay').classList.add('open');
+});
+
+// Close card popup
+document.getElementById('card-popup-close').addEventListener('click', () => {
+  document.getElementById('card-popup-overlay').classList.remove('open');
+});
+document.getElementById('card-popup-overlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+// Open sign modal
+document.getElementById('sign-card-btn').addEventListener('click', () => {
+  document.getElementById('sign-card-name').value = loadSavedAuthorName();
+  document.getElementById('sign-card-message').value = '';
+  document.getElementById('sign-card-overlay').classList.add('open');
+});
+
+// Close sign modal
+document.getElementById('sign-card-cancel').addEventListener('click', () => {
+  document.getElementById('sign-card-overlay').classList.remove('open');
+});
+document.getElementById('sign-card-overlay').addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('open');
+});
+
+// Readable fonts only for the card — excludes DEMO and SVG-variant fonts
+const CARD_FONT_KEYS = [
+  'beth-ellen', 'beverly-sage', 'fighter-attack', 'gathenia',
+  'humble-signation', 'jalliya', 'rockybilly', 'samarata',
+  'signatie', 'vanilla-cream',
+];
+
+// Submit signature
+document.getElementById('sign-card-submit').addEventListener('click', () => {
+  const author  = document.getElementById('sign-card-name').value.trim();
+  const message = document.getElementById('sign-card-message').value.trim();
+  if (!author)  { alert('Please enter your name.'); return; }
+  if (!message) { alert('Please write a message for Garrick.'); return; }
+  saveAuthorName(author);
+  const fontKey = CARD_FONT_KEYS[Math.floor(Math.random() * CARD_FONT_KEYS.length)];
+  push(gwsRef, { author, message, font: fontKey, ts: Date.now() })
+    .then(newRef => rememberGwsKey(newRef.key));
+  document.getElementById('sign-card-overlay').classList.remove('open');
+});
+</script>
+
+</body>
+</html>

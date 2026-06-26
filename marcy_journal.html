@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bai Detective Agency — M. Marple</title>
+  <link rel="icon" type="image/png" href="Assets/Images/d20.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Caveat:wght@400;600&family=IM+Fell+English:ital@0;1&family=Special+Elite&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="CSS/marcy_journal.css">
+  <link rel="stylesheet" href="CSS/case_files.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     LANDING / HALLWAY SCENE
+══════════════════════════════════════════════════════════════════════ -->
+<div id="landing" class="scene active" data-scene="hallway">
+  <div class="landing-inner">
+    <div class="ambient-warmth" aria-hidden="true"></div>
+
+    <div class="door-hotspot" id="door-btn" role="button" tabindex="0" aria-label="Enter the detective agency">
+      <span class="hit-target door-hit-target" aria-hidden="true"></span>
+      <img class="landing-art" src="Assets/Images/lp_door.png" alt="" aria-hidden="true">
+    </div>
+
+    <div class="journal-hotspot" id="journal-btn" role="button" tabindex="0" aria-label="Pick up Marcy's journal">
+      <span class="hit-target journal-hit-target" aria-hidden="true"></span>
+      <img class="landing-art" src="Assets/Images/lp_journal.png" alt="" aria-hidden="true">
+    </div>
+  </div>
+
+  <div id="credits-panel" class="credits-panel" aria-hidden="true">
+    <div class="credits-body">
+      <button id="credits-close" class="credits-close" type="button" aria-label="Close">
+        &#x2715;</button>
+      <div class="credits-inner">
+        <h2 class="credits-heading">About This Site</h2>
+        <div class="credits-text">
+
+<div class="credits-page">
+
+<div class="credits-section">
+<p>Howdy hey! This is a personal fan project. It is a character journal and notice board built for our D&amp;D campaign, following Marcy Marple, a detective-in-training working out of the Bai Detective Agency in Throneport, Karrnath. It isn't distributed anywhere beyond our table. It exists purely because I love this campaign and wanted somewhere for it to live outside of session notes.</p>
+
+<p>Honestly, I could never decide how to do character journals too. I have all the crafting supplies and materials sitting ready to make a physical one. But I wanted something the other players could actually interact with too, not just something that sits in my room just for me to enjoy. So I guess I made it harder on myself and built this instead!</p>
+
+<p>The whole thing is an homage to the things that got me into mysteries and interactive fiction in the first place: <strong>Nancy Drew PC games</strong> (the old Her Interactive point-and-click series and the broader <strong>point-and-click adventure game genre</strong> of the late '90s and 2000s.</p>
+</div>
+
+<div class="credits-section">
+<h3 class="deco-h3">Personal Thanks</h3>
+<p>To Tom — thank you for making it possible for me to keep playing this campaign every week. You cover what it costs for me to sit at this table, and that generosity is the only reason Marcy Marple gets to keep solving cases. This whole website exists because of that!</p>
+<p>To our DM, for building a world worth obsessing over enough to make a fan website for it.</p>
+<p>To my brain and my ADHD meds. Thank you for keeping me on track and keeping the motivation alive long enough to actually make and finish this, instead of just talking about it forever</p>
+</div>
+
+<div class="credits-section">
+<h2 class="deco-h2">Credits &amp; Sources</h2>
+</div>
+
+<div class="credits-section">
+<h3 class="deco-h3">Images</h3>
+<ul>
+  <li>Cork board / notice board background — original composition combining a Nancy Drew inspired color palette with Art Deco pattern motifs.</li>
+  <li>"The Boneport" magazine photo — a vintage Bettie Page pin-up photograph, used here purely for personal, non-commercial flavor as an in-universe gag prop (a censored "girlie mag" pinned to a 1920s detective office corkboard). The leaf overlays were added by me in Photoshop for modesty. This image is not original work and is used for personal enjoyment only — it is not redistributed, sold, or claimed as my own, and would need to be replaced with an original or properly licensed image before any public or commercial use.</li>
+  <li>Other small icons and UI assets (phonograph, magnifying glass cursors, folder, bulletin board icons, etc.) — either found as free-use assets online or created by me in Photoshop.</li>
+</ul>
+</div>
+
+<div class="credits-section">
+<h3 class="deco-h3">Fonts</h3>
+<p>All fonts used are free, demo, or open-license fonts sourced from <strong>DaFont</strong>, <strong>FontSpace</strong>, and <strong>Google Fonts</strong>. Full credit to their respective creators — I don't have a complete list of every individual designer, but none of these fonts were paid or premium licenses, and all were free for personal use at time of download.</p>
+</div>
+
+<div class="credits-section">
+<h3 class="deco-h3">Sound</h3>
+<p>Ambient tracks, door sounds, page-turn effects, and writing sounds were sourced from public-domain YouTube audio, <strong>Pixabay Audio</strong>, and free-license tracks from creators including <strong>Dragon Studios</strong> and contributors to the <strong>Freesound community</strong>. Full credit to those original creators.</p>
+<p>The office/case-file background music is the <strong>L.A. Noire menu theme</strong>, which is copyrighted material owned by Rockstar Games / Team Bondi. It's used here purely for personal, non-commercial fan enjoyment — not redistributed, monetized, or claimed as original work.</p>
+</div>
+
+<div class="credits-section">
+<h3 class="deco-h3">Code &amp; Implementation Ideas</h3>
+<ul>
+  <li><strong>Firebase (Google)</strong> powers the live notice board — community notes and custom calendar events sync in real time via Firebase Realtime Database.</li>
+  <li><strong>Calendar of Galifar data and structure</strong> referenced from a calendar built on <strong>Fantasy Calendar</strong> (fantasy-calendar.com) — month names, week structure, and Eberron holiday data.</li>
+  <li><strong>Art Deco button styling</strong> adapted from a CodePen by <strong>ol-ivier</strong> (Art Deco Button Anthology).</li>
+  <li><strong>Taped paper note styling</strong> adapted from a CodePen by <strong>sdthornton</strong>.</li>
+  <li>Everything else — the scene system, journal page-turning, case file reader, calendar generator, weather system, and notice board functionality — was custom-built for this project.</li>
+</ul>
+</div>
+
+<hr>
+
+<p style="text-align:center;"><em>This project is non-commercial, made for personal and small-group use only. If anything here is yours and you'd like it credited differently or removed, please reach out.</em></p>
+
+</div>
+            
+            
+        </div>
+        <button id="credits-back" class="credits-back-btn" type="button">&#8592; Back to Hallway</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     INTRO CARD
+══════════════════════════════════════════════════════════════════════ -->
+<aside id="intro-card" class="intro-card hallway-only" aria-label="Scene introduction">
+  <span class="intro-corner intro-corner-tl" aria-hidden="true">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M2 14 Q2 2 14 2" stroke="#c4a040" stroke-width="1.1"/><circle cx="5" cy="5" r="1.6" fill="#c4a040" opacity="0.5"/></svg>
+  </span>
+  <span class="intro-corner intro-corner-tr" aria-hidden="true">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M2 14 Q2 2 14 2" stroke="#c4a040" stroke-width="1.1"/><circle cx="5" cy="5" r="1.6" fill="#c4a040" opacity="0.5"/></svg>
+  </span>
+  <span class="intro-corner intro-corner-bl" aria-hidden="true">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M2 14 Q2 2 14 2" stroke="#c4a040" stroke-width="1.1"/><circle cx="5" cy="5" r="1.6" fill="#c4a040" opacity="0.5"/></svg>
+  </span>
+  <span class="intro-corner intro-corner-br" aria-hidden="true">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M2 14 Q2 2 14 2" stroke="#c4a040" stroke-width="1.1"/><circle cx="5" cy="5" r="1.6" fill="#c4a040" opacity="0.5"/></svg>
+  </span>
+  <div class="intro-ornament" aria-hidden="true">
+    <span class="orn-line"></span>
+    <span class="orn-diamond">◆</span>
+    <span class="orn-line"></span>
+  </div>
+
+  <h2>Throneport, 1010 YK.</h2>
+
+  <p class="intro-body">Bai's name is on the door. Garrick takes up most of the office. Xander turns up when something strange needs looking at, which around here is more often than you'd think.</p>
+
+  <p class="intro-body">I'm Marcy. Marcy Marple, with an R. Girl detective, prodigy, or just regular old nosey nelly depending on who you ask. Newest one here, fresh off the boat from Breland, still finding my footing in a city this size. Small town cases are neat, but I wanted something with a little more — more, ya know? Throneport seems to have an abundance of that in it.</p>
+
+  <p class="intro-body">Of course there were other reasons I left when I did, though to be fair I'm still sort of figuring out what they are exactly. I do know my dad is involved somehow, and there's this weird note I've been carrying around — I haven't told anyone about it yet. It's probably nothing...probably.</p>
+
+  <p class="intro-body intro-nav" style="animation-delay:0.7s;">The <button class="intro-link" id="choice-door" type="button">case files</button> are through the office door. My <button class="intro-link" id="choice-journal" type="button">journal</button> is where I actually work things out. The <button class="intro-link" id="choice-notice" type="button">notice board</button> is everything we're still chasing.</p>
+  <p class="intro-body intro-sig" style="animation-delay:0.95s;">— M. Marple</p>
+</aside>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     OFFICE SCENE
+══════════════════════════════════════════════════════════════════════ -->
+<div id="office-scene" class="scene scene--office" data-scene="office" aria-hidden="true">
+
+  <div class="scene-bg" aria-hidden="true"></div>
+  <div class="scene-vignette" aria-hidden="true"></div>
+
+<div id="board-help" class="board-help" style="display:none;">
++ Pin a Note to leave a message.<br>
+Drag your own notes around.<br>
+Click notes to inspect them.<br>
+Only remove your own.<br><br>
+
+<em>Please don't turn the board into a crime scene.</em>
+</div>
+
+  <!-- Back to hallway -->
+  <button class="scene-back-btn" id="office-back-btn" type="button" aria-label="Go back to hallway">
+    <img src="Assets/Images/back%20door.png" alt="" aria-hidden="true">
+  </button>
+  <button class="scene-back-label" id="office-back-label" type="button" aria-label="Back to hallway">Back to hallway</button>
+
+  <!-- Context subnav -->
+  <button id="subnav-to-notice" class="office-subnav-btn office-hidden" type="button" aria-label="Go to notice board">
+    <img src="Assets/Agency%20Content/bb.png" alt="" aria-hidden="true">
+  </button>
+  <span class="office-subnav-label" id="subnav-to-notice-label">Notice Board</span>
+
+  <button id="subnav-to-case" class="office-subnav-btn office-hidden" type="button" aria-label="Go to case files">
+    <img src="Assets/Agency%20Content/folder.png" alt="" aria-hidden="true">
+  </button>
+  <span class="office-subnav-label" id="subnav-to-case-label">Case Files</span>
+
+  <div class="scene-stage" aria-label="Office — case files and notice board">
+    <div class="office-content-frame">
+
+      <div id="office-nav" class="office-nav" aria-label="Office navigation">
+        <button id="office-nav-case" class="office-menu-btn" type="button">Case Files</button>
+        <button id="office-nav-notice" class="office-menu-btn" type="button">Notice Board</button>
+      </div>
+
+      <div id="office-panel-case" class="office-panel office-hidden" aria-label="Case files">
+
+        <button id="case-closed-hotspot"
+        class="office-card office-card--case-seq case-file-clickable"
+        type="button"
+        aria-label="Open the case files"
+        data-case-img="Assets/Agency%20Content/cf_closed.png">
+  <img class="case-file-img"
+       src="Assets/Agency%20Content/cf_closed.png"
+       alt="Closed case file envelope">
+</button>
+
+        <button id="case-content-hotspot" class="office-card office-card--case-seq office-hidden" type="button" aria-label="View case file contents" style="pointer-events:none;">
+          <img src="Assets/Agency%20Content/cf_content.png" alt="Open case file folder">
+          <span class="cf-case-entry" id="cf-case-entry-001">Case 001 — The Lamur Situation</span>
+          <span class="cf-case-entry" id="cf-case-entry-002">Case 002 — The Purple House</span>
+          <span class="cf-case-entry" id="cf-case-entry-003">Case 003 — The Langstrom Disappearance</span>
+          <span class="cf-case-entry" id="cf-case-entry-004">Case 004 — Working On It</span>
+          <span class="cf-case-entry" id="cf-case-entry-005">Case 005 — Working On It</span>
+        </button>
+
+        <!-- Case number hotspots — position these over the text in cf_content.png -->
+        <button id="case-hotspot-001" class="case-num-hotspot office-hidden" type="button" data-case-id="001" aria-label="Open Case 001"></button>
+        <button id="case-hotspot-002" class="case-num-hotspot office-hidden" type="button" data-case-id="002" aria-label="Open Case 002"></button>
+        <button id="case-hotspot-003" class="case-num-hotspot office-hidden" type="button" data-case-id="003" aria-label="Open Case 003"></button>
+        <button id="case-hotspot-004" class="case-num-hotspot office-hidden" type="button" data-case-id="004" aria-label="Open Case 004"></button>
+        <button id="case-hotspot-005" class="case-num-hotspot office-hidden" type="button" data-case-id="005" aria-label="Open Case 005"></button>
+
+        <div id="case-pages-overlay" class="case-pages-overlay office-hidden" aria-label="Case file pages"></div>
+
+        <div class="page-edge-zones" aria-hidden="true">
+          <div class="edge-zone edge-zone-left" id="case-seq-prev"></div>
+          <div class="edge-zone edge-zone-center"></div>
+          <div class="edge-zone edge-zone-right" id="case-seq-next"></div>
+        </div>
+      </div>
+
+      <div id="office-panel-notice" class="office-panel office-hidden" aria-label="Community notice board">
+        <iframe src="Assets/Notices/notice_board.html"
+                style="width:100%; height:100%; border:none; display:block;"
+                title="Notice board">
+        </iframe>
+       
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     INN / JOURNAL SCENE
+══════════════════════════════════════════════════════════════════════ -->
+<div id="room1-scene" class="scene scene--journal" data-scene="room1" aria-hidden="true">
+
+  <div class="scene-bg"       aria-hidden="true"></div>
+  <div class="scene-vignette" aria-hidden="true"></div>
+
+  <button class="scene-back-btn"   id="room1-back-btn"   type="button" aria-label="Go back to hallway">
+    <img src="Assets/Images/back%20door.png" alt="" aria-hidden="true">
+  </button>
+  <button class="scene-back-label" id="room1-back-label" type="button" aria-label="Back to hallway">Back to hallway</button>
+
+  <div class="scene-stage" aria-label="Marcy's journal">
+    <div class="journal-desk-wrap">
+      <img class="journal-desk-layer" src="Assets/Inn%20Content/j_blank.png" alt="" aria-hidden="true">
+      <div id="journal-text-left"  class="journal-text-left"  aria-live="polite"></div>
+      <div id="journal-text-right" class="journal-text-right" aria-live="polite"></div>
+      <div class="journal-zone-left"  aria-label="Previous page"></div>
+      <div class="journal-zone-right" aria-label="Next page"></div>
+    </div>
+  </div>
+
+</div><!-- end #room1-scene -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     GLOBAL ELEMENTS
+══════════════════════════════════════════════════════════════════════ -->
+
+<div id="global-shadow-overlay" aria-hidden="true"></div>
+
+<button id="gramophone-toggle" class="gramophone-btn" type="button" aria-label="Toggle background music">
+  <img src="Assets/Images/phonograph.png" alt="" aria-hidden="true">
+</button>
+<span id="gramophone-status" class="gramophone-status" aria-live="polite">Music On</span>
+
+<button id="credits-btn" class="credits-btn hallway-only" type="button" aria-label="About & Credits">
+  <span></span><span></span><span></span>
+</button>
+
+<footer class="site-footer" aria-label="Copyright">
+  &#9670; &copy; 2026 Bai Detective Agency &mdash; Throneport, 1010 YK &#9670;
+</footer>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════════════════════════ -->
+<script src="JS/marcy_page_data.js"></script>
+<script src="JS/journal_page_data.js"></script>
+<script src="JS/case_files.js"></script>
+<script src="JS/marcy_journal.js"></script>
+
+
+</body>
+</html>

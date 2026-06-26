@@ -1,0 +1,266 @@
+/* =============================================================================
+   CASE FILES — Hotspots + in-panel page overlay
+   ============================================================================= */
+
+/* ── Closed envelope hotspot — smaller than full-panel ───────────────────────*/
+#case-closed-hotspot {
+  width:  58%;
+  height: 88%;
+  overflow: visible;
+ }
+
+#case-closed-hotspot img {
+  position: absolute; 
+  top: -253px;
+  right:50px;
+  bottom:50px;
+  left:17px;
+   
+  width: 101%; height: 160%; z-index: 1;
+}
+
+/* ── Case number hotspots — transparent buttons over the case list image ─────
+   Adjust top/left/width/height per button to match text in cf_content.png   */
+.case-num-hotspot {
+  position: absolute;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: var(--cursor-hover);
+  z-index: 15;
+}
+
+.case-num-hotspot:hover {
+  background: rgba(21, 113, 115, 0.342);
+  outline: 1px solid rgba(196, 147, 11, 0.35);
+}
+
+/* ── Case file entries — typed text overlaid on cf_content.png ───────────────*/
+.cf-case-entry {
+  position: absolute;
+  font-family: 'Special Elite', serif;
+  color: #2c1a0e;
+  font-size: 17px;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+#cf-case-entry-001 { top: 28%;   left: 53%; }
+#cf-case-entry-002 { top: 32%;   left: 53%; }
+#cf-case-entry-003 { top: 36%;   left: 53%; }
+#cf-case-entry-004 { top: 40%;   left: 53%; }
+#cf-case-entry-005 { top: 44%;   left: 53%; }
+
+/* Case hotspots — same size, stacked 4% apart */
+#case-hotspot-001 { top: 27.5%; left: 53%; width: 18%; height: 3%; }
+#case-hotspot-002 { top: 31.5%; left: 53%; width: 18%; height: 3%; }
+#case-hotspot-003 { top: 35.5%; left: 53%; width: 21%; height: 3%; }
+#case-hotspot-004 { top: 39.5%; left: 53%; width: 18%; height: 3%; }
+#case-hotspot-005 { top: 43.5%; left: 53%; width: 18%; height: 3%; }
+
+/* ── Pages overlay — sits over cf_content.png inside the panel ───────────────
+   No backdrop colour; pages just float over the open case file image.       */
+.case-pages-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.case-pages-overlay:not(.office-hidden) {
+  pointer-events: auto;
+}
+
+/* ── Overlay nav arrows — sides of the case pages overlay ───────────────────*/
+.cf-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(196, 160, 64, 0.65);
+  font-size: 5vw;
+  line-height: 1;
+  cursor: var(--cursor-hover);
+  z-index: 25;
+  padding: 0.5rem 1rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.cf-nav-arrow:hover {
+  color: rgba(196, 160, 64, 1);
+  transform: translateY(-50%) scale(1.2);
+}
+
+.cf-nav-arrow--left  { left:  1%; }
+.cf-nav-arrow--right { right: 1%; }
+
+/* ── Individual page buttons ─────────────────────────────────────────────────*/
+.cf-page-btn {
+  position: absolute;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: var(--cursor-default);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+              opacity   0.2s ease;
+  transform-origin: center center;
+}
+
+.cf-page-btn:hover {
+  transform: scale(1.05);
+  z-index: 2;
+}
+
+/* ── Per-page positions and sizes — adjust to taste ─────────────────────────*/
+.cf-page-btn[data-page="1"] {
+  top:  0%;   /* move up/down  */
+  left: 2%;    /* move left/right */
+
+  & .cf-page-img { width: 31vw; height: auto; }
+}
+
+.cf-page-btn[data-page="2"] {
+  top:  0%;   /* move up/down  */
+  left: 44%;   /* move left/right */
+
+  & .cf-page-img { width: 31vw; height: auto; }
+}
+
+.cf-page-btn[data-page="3"] {
+  top:  2%;
+  left: 66%;
+
+  & .cf-page-img { width: 28vw; height: auto; }
+}
+
+/* ── Note tucked under a page — sits before its page in DOM, naturally behind ─*/
+.cf-note {
+  position: absolute;
+  pointer-events: auto;
+  cursor: var(--cursor-hover);
+  transition: transform 0.35s ease, clip-path 0.35s ease;
+  clip-path: inset(0 0 0 0);
+}
+
+.cf-note-img {
+  display: block;
+  width: 13vw;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── Case 002 note — attached to cf_002 (page 1), toggles behind it on click ─*/
+.case-pages-overlay[data-case="002"] .cf-note[data-under-page="1"] {
+  top:  66%;
+  left: 69%;
+  z-index: 4;
+  transform: rotate(5deg);
+}
+
+/* Tucked: clip to a thin visible strip on the right edge — stays at z-index 4 so it's always clickable */
+.case-pages-overlay[data-case="002"] .cf-note[data-under-page="1"].cf-note--tucked {
+  clip-path: inset(0 0 0 80%);
+  transform: rotate(0deg);
+}
+
+/* ── Case 002 — stacked/fanned layout ───────────────────────────────────────*/
+.case-pages-overlay[data-case="002"] .cf-page-btn[data-page="1"] {
+  top: 1%; left: 28%;
+  z-index: 3;
+  --page-rotate: 0deg;
+  transform: rotate(var(--page-rotate));
+  & .cf-page-img { width: 31vw; height: auto; }
+}
+.case-pages-overlay[data-case="002"] .cf-page-btn[data-page="2"] {
+  top: 1%; left: 22%;
+  z-index: 2;
+  --page-rotate: -1deg;
+  transform: rotate(var(--page-rotate));
+  & .cf-page-img { width: 31vw; height: auto; }
+}
+.case-pages-overlay[data-case="002"] .cf-page-btn[data-page="3"] {
+  top: 1%; left: 40%;
+  z-index: 1;
+  --page-rotate: 0deg;
+  transform: rotate(var(--page-rotate));
+  & .cf-page-img { width: 31vw; height: auto; }
+}
+.case-pages-overlay[data-case="002"] .cf-page-btn:hover {
+  transform: scale(1.05) rotate(var(--page-rotate, 0deg));
+}
+.case-pages-overlay[data-case="002"] .cf-page-btn.cf-page--raised {
+  z-index: 10;
+}
+
+/* ── Case 003 — side-by-side with slight tilt ───────────────────────────────*/
+.case-pages-overlay[data-case="003"] .cf-page-btn[data-page="1"] {
+  top: -2%; left: 2%;
+  --page-rotate: -2deg;
+  transform: rotate(var(--page-rotate));
+  & .cf-page-img { width: 31vw; height: auto; }
+}
+.case-pages-overlay[data-case="003"] .cf-page-btn[data-page="2"] {
+  top: 0%; left: 44%;
+  --page-rotate: 2deg;
+  transform: rotate(var(--page-rotate));
+  & .cf-page-img { width: 31vw; height: auto; }
+}
+.case-pages-overlay[data-case="003"] .cf-page-btn:hover {
+  transform: scale(1.05) rotate(var(--page-rotate, 0deg));
+}
+.case-pages-overlay[data-case="003"] .cf-page-btn.cf-page--raised {
+  z-index: 10;
+}
+
+/* ── Overlay preview images — small, raw, no border or shadow ───────────────*/
+.cf-page-img {
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── Drag-to-pan reading window ───────────────────────────────────────────── */
+
+/* Outer shell — full-screen, catches clicks outside the window to close */
+.cf-drag-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: var(--cursor-hover);
+  background: rgba(8, 18, 12, 0.78);
+}
+
+/* The reading window — fixed size, clips overflowing image; cursor reverts here */
+.cf-drag-window {
+  position: relative;
+  width:  64vw;
+  height: 97vh;
+  overflow: visible;
+  pointer-events: auto;
+  cursor: grab;
+  /* Stops clicks inside from bubbling up and triggering the close handler */
+}
+
+.cf-drag-window.is-dragging {
+  cursor: grabbing;
+}
+
+/* The image — fills the window width; portrait docs overflow downward */
+.cf-drag-img {
+  position: absolute;
+  top:  0;
+  left: 0;
+  width: 70%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+
